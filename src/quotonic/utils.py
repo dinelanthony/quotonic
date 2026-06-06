@@ -271,6 +271,7 @@ def genWeylSet(m: int = 2, vectorized: bool = False) -> np_ndarray:
                 [[ 0.+0.0000000e+00j,  1.+0.0000000e+00j],
                 [-1.+1.2246468e-16j, -0.+0.0000000e+00j]]])
     """
+    
     if vectorized:
         return np.array([np.exp(2j * np.pi * m_ * np.arange(m) / m)[:, None] * np.roll(np.eye(m), n, axis=1) for m_ in range(m) for n in range(m)], dtype=complex)
     

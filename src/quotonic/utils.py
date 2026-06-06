@@ -177,3 +177,111 @@ def vectorial_factorial(x: int | float) -> int | float:
         Factorial of the input
     """
     return factorial(x)  # type: ignore
+
+def genGGMSet(m=1):
+    """Generate the set of $m$-dimensional Generalized Gell-Mann matrices.
+    
+    This function follows the procedure outlined in [R. A. Bertlmann and P. Krammmer, "Bloch vectors 
+    for qudits", arXiv:quant-ph/0806.1174v1 (2008)](https://arxiv.org/abs/0806.1174)
+    
+    Args:
+        m: dimension of the square $m \\times m$ Gell-Mann matrices
+        
+    Returns:
+        A list of $m^2 - 1$ $m \\times m$ Generalized Gell-Mann matrices
+
+    Examples:
+        >>> genGGMSet(m=2)
+        array([[[ 0.+0.j,  1.+0.j],
+                [ 1.+0.j,  0.+0.j]],
+
+                [[ 0.+0.j, -0.-1.j],
+                [ 0.+1.j,  0.+0.j]],
+
+                [[ 1.+0.j,  0.+0.j],
+                [ 0.+0.j, -1.+0.j]]])
+
+    """
+
+    ggm_set = []
+
+    # Symmetric Gell-Mann matrices
+    for k in range(m):
+        for j in range(k + 1, m):
+            ggm = np.zeros((m, m), dtype=complex)
+            ggm[k, j] = 1
+            ggm[j, k] = 1
+            ggm_set.append(ggm)
+
+    # Antisymmetric Gell-Mann matrices
+    for k in range(m):
+        for j in range(k + 1, m):
+            ggm = np.zeros((m, m), dtype=complex)
+            ggm[k, j] = -1j
+            ggm[j, k] = 1j
+            ggm_set.append(ggm)
+
+    # Diagonal Gell-Mann matrices
+    for k in range(1, m):
+        ggm = np.zeros((m, m), dtype=complex)
+        for j in range(k):
+            ggm[j, j] = 1
+        ggm[k, k] = -k
+        ggm_set.append(ggm / np.sqrt(k * (k + 1)) if k > 1 else ggm)
+
+    return np.array(ggm_set, dtype=complex)
+
+def genWeylSet(m=2, vectorized = False):
+    """Generate the set of $m$-dimensional Weyl matrices.
+
+    This function follows the procedure outlined in [R. A. Bertlmann and P. Krammmer, "Bloch vectors 
+    for qudits", arXiv:quant-ph/0806.1174v1 (2008)](https://arxiv.org/abs/0806.1174)
+
+    Args:
+        m: dimension of the square $m \\times m$ Weyl matrices
+        vectorized: if True, calculates the Weyl matrices using vectorized operations for improved performance.
+        
+    Returns:
+        A list of $m^2 - 1$ $m \\times m$ Weyl matrices
+
+    Examples:
+        >>> genWeylSet()
+        array([[[ 1.+0.0000000e+00j,  0.+0.0000000e+00j],
+                [ 0.+0.0000000e+00j,  1.+0.0000000e+00j]],
+
+                [[ 0.+0.0000000e+00j,  1.+0.0000000e+00j],
+                [ 1.+0.0000000e+00j,  0.+0.0000000e+00j]],
+
+                [[ 1.+0.0000000e+00j,  0.+0.0000000e+00j],
+                [ 0.+0.0000000e+00j, -1.+1.2246468e-16j]],
+
+                [[ 0.+0.0000000e+00j,  1.+0.0000000e+00j],
+                [-1.+1.2246468e-16j,  0.+0.0000000e+00j]]])
+        
+        >>> genWeylSet(m=2, vectorized=True)
+        array([[[ 1.+0.0000000e+00j,  0.+0.0000000e+00j],
+                [ 0.+0.0000000e+00j,  1.+0.0000000e+00j]],
+
+                [[ 0.+0.0000000e+00j,  1.+0.0000000e+00j],
+                [ 1.+0.0000000e+00j,  0.+0.0000000e+00j]],
+
+                [[ 1.+0.0000000e+00j,  0.+0.0000000e+00j],
+                [-0.+0.0000000e+00j, -1.+1.2246468e-16j]],
+
+                [[ 0.+0.0000000e+00j,  1.+0.0000000e+00j],
+                [-1.+1.2246468e-16j, -0.+0.0000000e+00j]]])
+    """
+    if vectorized:
+        return np.array([np.exp(2j * np.pi * m_ * np.arange(m) / m)[:, None] * np.roll(np.eye(m), n, axis=1) for m_ in range(m) for n in range(m)], dtype=complex)
+    
+    else:
+        weyl_set = []
+
+        # Generate the Weyl matrices
+        for m_ in range(m):
+            for n in range(m):
+                weyl = np.zeros((m, m), dtype=complex)
+                for k in range(m):
+                    weyl[k, (k + n) % m] = np.exp(2j * np.pi * m_ * k / m)
+                weyl_set.append(weyl)
+        return np.array(weyl_set, dtype=complex)

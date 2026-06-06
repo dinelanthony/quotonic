@@ -178,7 +178,7 @@ def vectorial_factorial(x: int | float) -> int | float:
     """
     return factorial(x)  # type: ignore
 
-def genGGMSet(m=1):
+def genGGMSet(m: int = 2) -> np_ndarray:
     """Generate the set of $m$-dimensional Generalized Gell-Mann matrices.
     
     This function follows the procedure outlined in [R. A. Bertlmann and P. Krammmer, "Bloch vectors 
@@ -231,7 +231,7 @@ def genGGMSet(m=1):
 
     return np.array(ggm_set, dtype=complex)
 
-def genWeylSet(m=2, vectorized = False):
+def genWeylSet(m: int = 2, vectorized: bool = False) -> np_ndarray:
     """Generate the set of $m$-dimensional Weyl matrices.
 
     This function follows the procedure outlined in [R. A. Bertlmann and P. Krammmer, "Bloch vectors 
